@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LMAO</title>
+  <style>
+    body {
+      background-color: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #8AFF8A;
+      font-family: 'Consolas', 'Courier New', Courier, monospace;
+      font-size: calc(1.5vw + 1.5vh + 1vmin);
+      padding: 0 5%;
+    }
+
+    #location,
+    #specs {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: calc(1vw + 1vh + 0.5vmin);
+      text-align: center;
+      margin-top: 5px;
+      animation: typing 3s steps(50) forwards;
+    }
+
+    @keyframes typing {
+      from { width: 0; }
+    }
+  </style>
+</head>
+<body>
+  <script>
+    window.onload = function() {
+      const ipAddressElement = document.createElement('p');
+      ipAddressElement.style.color = 'green';
+      ipAddressElement.style.fontFamily = 'Consolas, Courier New, Courier, monospace';
+      ipAddressElement.style.fontSize = 'calc(2vw + 2vh + 2vmin)';
+      ipAddressElement.style.animation = 'typing 3s steps(18) forwards';
+
+      const locationElement = document.createElement('p');
+      locationElement.id = 'location';
+
+      const specsElement = document.createElement('p');
+      specsElement.id = 'specs';
+
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          const ipAddress = data.ip;
+          typeWriter(ipAddress, ipAddressElement);
+          fetch(`https://ipapi.co/${ipAddress}/json/`)
+            .then(response => response.json())
+            .then(data => {
+              const location = `${data.city}, ${data.region}, ${data.country_name}`;
+              typeWriterLocation(`Location: ${location}`, locationElement);
+              setTimeout(() => {
+                const specs = `Device Specs: ${navigator.userAgent}`;
+                typeWriterSpecs(specs, specsElement);
+              }, 3000); // Wait for IP and Location animations to complete (3000ms = 3s)
+            })
+            .catch(error => {
+              console.error('Error fetching location:', error);
+              locationElement.innerText = 'Location: Unknown';
+            });
+        })
+        .catch(error => {
+          console.error('Error fetching IP address:', error);
+          typeWriter('Unable to retrieve IP address', ipAddressElement);
+          locationElement.innerText = 'Location: Unknown';
+        });
+
+      function typeWriter(text, element) {
+        let i = 0;
+        function type() {
+          if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(type, 100);
+          }
+        }
+        type();
+      }
+
+      function typeWriterLocation(text, element) {
+        let i = 0;
+        function typeLocation() {
+          if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typeLocation, 100);
+          }
+        }
+        typeLocation();
+      }
+
+      function typeWriterSpecs(text, element) {
+        let i = 0;
+        function typeSpecs() {
+          if (i < text.length) {
+            element.innerHTML += text.charAt(i);
+            i++;
+            setTimeout(typeSpecs, 100);
+          }
+        }
+        typeSpecs();
+      }
+
+      document.body.appendChild(ipAddressElement);
+      document.body.appendChild(locationElement);
+      document.body.appendChild(specsElement);
+    };
+  </script>
+</body>
+</html>
+  
